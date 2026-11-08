@@ -1,0 +1,52 @@
+# ==========================================================
+# Python & Sanal Ortam (Virtual Environment)
+# ==========================================================
+venv/
+.venv/
+env/
+ENV/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# ==========================================================
+# Proje Çalışma Zamanı Çıktıları & Büyük Dosyalar
+# (Eğitilmiş modeller, geçici yüklemeler ve loglar)
+# ==========================================================
+models/
+uploads/
+model_library/
+logs/
+*.log
+*.pth
+*.pt
+
+# ==========================================================
+# Test ve Geliştirme Araçları Önbellekleri
+# ==========================================================
+.pytest_cache/
+.hypothesis/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# ==========================================================
+# IDE, Editör ve Asistan Klasörleri
+# ==========================================================
+.vscode/
+.idea/
+.kiro/
+*.swp
+*.swo
+
+# ==========================================================
+# Ortam Değişkenleri ve İşletim Sistemi Dosyaları
+# ==========================================================
+.env
+.env.local
+.DS_Store
+Thumbs.db
+desktop.ini

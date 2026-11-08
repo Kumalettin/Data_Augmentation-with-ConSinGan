@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📸 Data Augmentation Uygulaması</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📸 Data Augmentation AI</h1>
+            <p>Görsellerinizi yükleyin, profesyonel tekniklerle saniyeler içinde zenginleştirin.</p>
+        </header>
+
+        <main class="main-content">
+            <!-- Tab Navigation -->
+            <div class="tab-navigation">
+                <button class="tab-button active" data-tab="traditional">
+                    🔄 Geleneksel Augmentation
+                </button>
+                <button class="tab-button" data-tab="ai">
+                    🤖 AI Destekli Augmentation (ConSinGAN)
+                </button>
+            </div>
+
+            <!-- Tab Content Container -->
+            <div class="tabs-container">
+                <!-- Traditional Augmentation Tab -->
+                <div id="traditional-tab" class="tab-content active">
+                    <!-- Sol Panel: Yükleme ve Ayarlar -->
+                    <div class="sidebar">
+                <div class="card upload-section" id="drop-zone">
+                    <input type="file" id="file-input" accept="image/png, image/jpeg, image/jpg" hidden>
+                    <div class="upload-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    </div>
+                    <h2>Sürükle & Bırak veya Seç</h2>
+                    <p class="text-sm">PNG, JPG, JPEG (Max: 10MB)</p>
+                    
+                    <div class="preview-container" id="preview-container" style="display: none;">
+                        <img id="original-image" src="" alt="Orijinal Görsel">
+                        <button id="remove-image" class="btn-icon" title="Görseli Kaldır">✖</button>
+                    </div>
+                </div>
+
+                <div class="card settings-section" id="settings-section" style="opacity: 0.5; pointer-events: none;">
+                    <h3>⚙️ Ayarlar</h3>
+                    
+                    <div class="setting-group">
+                        <label for="num-images">Üretilecek Görsel Sayısı:</label>
+                        <input type="number" id="num-images" min="1" max="50" value="5">
+                    </div>
+
+                    <div class="setting-group techniques-group">
+                        <label>Augmentation Teknikleri:</label>
+                        <div class="techniques-grid">
+                            <label class="tech-option">
+                                <input type="checkbox" name="technique" value="rotate" checked>
+                                <span>🔄 Döndürme</span>
+                            </label>
+                            <label class="tech-option">
+                                <input type="checkbox" name="technique" value="flip" checked>
+                                <span>🪞 Aynalama</span>
+                            </label>
+                            <label class="tech-option">
+                                <input type="checkbox" name="technique" value="brightness" checked>
+                                <span>☀️ Parlaklık</span>
+                            </label>
+                            <label class="tech-option">
+                                <input type="checkbox" name="technique" value="contrast" checked>
+                                <span>🎨 Kontrast</span>
+                            </label>
+                            <label class="tech-option">
+                                <input type="checkbox" name="technique" value="blur">
+                                <span>🌫️ Bulanıklık</span>
+                            </label>
+                            <label class="tech-option">
+                                <input type="checkbox" name="technique" value="noise">
+                                <span>📡 Gürültü</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button id="generate-btn" class="btn primary-btn" disabled>
+                        <span>✨ Görselleri Oluştur</span>
+                    </button>
+                    <div id="loading-indicator" class="loading-indicator hidden">
+                        <div class="spinner"></div>
+                        <p>İşleniyor... Lütfen bekleyin.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sağ Panel: Sonuçlar -->
+            <div class="results-section">
+                <div class="results-header">
+                    <h2>Geliştirilmiş Görseller</h2>
+                    <div class="results-actions" id="results-actions" style="display: none;">
+                        <span id="results-count" class="badge">0 Sonuç</span>
+                        <button id="download-all-btn" class="btn secondary-btn">📥 Hepsini İndir</button>
+                    </div>
+                </div>
+                
+                <div id="results-grid" class="results-grid">
+                    <div class="empty-state">
+                        <div class="empty-icon">🖼️</div>
+                        <p>Henüz görsel oluşturulmadı. Başlamak için bir görsel yükleyip ayarları yapılandırın.</p>
+                    </div>
+                </div>
+                </div>
+                <!-- End Traditional Tab -->
+
+            </div>
+
+            <!-- AI Augmentation Tab -->
+            <div id="ai-tab" class="tab-content">
+                <!-- Sol Panel -->
+                <div class="sidebar">
+
+                    <!-- Mode Toggle -->
+                    <div class="card mode-toggle-card">
+                        <div class="mode-toggle">
+                            <button class="mode-btn active" id="mode-train-btn" data-mode="train">
+                                🎓 Yeni Model Eğit
+                            </button>
+                            <button class="mode-btn" id="mode-use-btn" data-mode="use">
+                                ⚡ Hazır Model Kullan
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- PANEL 1: Yeni Model Eğit -->
+                    <div id="panel-train">
+                        <div class="card upload-section" id="drop-zone-ai">
+                            <input type="file" id="file-input-ai" accept="image/png, image/jpeg, image/jpg" hidden>
+                            <div class="upload-icon">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                            </div>
+                            <h2>Sürükle & Bırak veya Seç</h2>
+                            <p class="text-sm">PNG, JPG, JPEG (Max: 10MB)</p>
+                            <div class="preview-container" id="preview-container-ai" style="display: none;">
+                                <img id="original-image-ai" src="" alt="Orijinal Görsel">
+                                <button id="remove-image-ai" class="btn-icon" title="Görseli Kaldır">✖</button>
+                            </div>
+                        </div>
+
+                        <div class="card settings-section" id="settings-section-ai" style="opacity: 0.5; pointer-events: none;">
+                            <h3>⚙️ Eğitim Ayarları</h3>
+
+                            <div class="setting-group">
+                                <label for="model-name">Model Adı (Opsiyonel):</label>
+                                <input type="text" id="model-name" placeholder="örn: efes_anit_v1">
+                                <small>Model adı verirseniz kütüphaneye kaydedilir</small>
+                            </div>
+
+                            <div class="setting-group">
+                                <label for="iterations">Iteration Sayısı (100-10000):</label>
+                                <input type="number" id="iterations" min="100" max="10000" value="500">
+                                <span class="error-message" id="iterations-error" style="display: none;"></span>
+                            </div>
+
+                            <div class="setting-group">
+                                <label for="learning-rate">Learning Rate (0.00001-0.001):</label>
+                                <input type="number" id="learning-rate" min="0.00001" max="0.001" step="0.00001" value="0.0002">
+                                <span class="error-message" id="learning-rate-error" style="display: none;"></span>
+                            </div>
+
+                            <button id="train-button" class="btn primary-btn" disabled>
+                                <span>🎓 Modeli Eğit</span>
+                            </button>
+
+                            <div id="training-progress-container" style="display: none;">
+                                <progress id="training-progress-bar" value="0" max="100"></progress>
+                                <div class="progress-info">
+                                    <span id="progress-percentage">0%</span>
+                                    <span id="progress-eta">ETA: --</span>
+                                </div>
+                                <p id="training-status-text">Eğitim başlatılıyor...</p>
+                                <div id="intermediate-gallery" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;"></div>
+                            </div>
+
+                            <div id="training-error" class="error-message" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- PANEL 2: Hazır Model Kullan -->
+                    <div id="panel-use" style="display: none;">
+                        <div class="card">
+                            <h3>⚡ Hazır Model ile Üret</h3>
+
+                            <div class="setting-group" style="margin-top: 1rem;">
+                                <label for="model-select">Model Seç:</label>
+                                <div class="select-wrapper">
+                                    <select id="model-select">
+                                        <option value="">-- Model yükleniyor... --</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="setting-group">
+                                <label for="num-images-ai">Üretilecek Görsel Sayısı:</label>
+                                <input type="number" id="num-images-ai" min="1" max="20" value="5">
+                            </div>
+
+                            <button id="quick-generate-btn" class="btn primary-btn" disabled>
+                                <span>⚡ Hızlı Üret</span>
+                            </button>
+
+                            <div id="quick-generate-loading" class="loading-indicator hidden" style="margin-top: 1rem;">
+                                <div class="spinner"></div>
+                                <p>Görüntüler üretiliyor...</p>
+                            </div>
+
+                            <div id="quick-generate-error" class="error-message" style="display: none;"></div>
+
+                            <button id="refresh-models-btn" class="btn secondary-btn" style="margin-top: 0.75rem; font-size: 0.85rem; padding: 0.5rem;">
+                                🔄 Modelleri Yenile
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Sağ Panel: Sonuçlar -->
+                <div class="results-section">
+                    <div class="results-header">
+                        <h2>Sentetik Görüntüler</h2>
+                        <div class="results-actions" id="results-actions-ai" style="display: none;">
+                            <span id="results-count-ai" class="badge">0 Sonuç</span>
+                            <button id="download-all-btn-ai" class="btn secondary-btn">📥 Hepsini İndir</button>
+                        </div>
+                    </div>
+
+                    <div id="results-grid-ai" class="results-grid">
+                        <div class="empty-state">
+                            <div class="empty-icon">🤖</div>
+                            <p>Henüz görsel oluşturulmadı.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End AI Tab -->
+        </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
